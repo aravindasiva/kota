@@ -4,7 +4,7 @@ import { fakeStoreApi, handleApiError } from "../utils/api";
 import { authMiddleware, AuthRequest } from "../middleware/authMiddleware";
 
 // Create the router with a descriptive name
-export const cartRouter = Router();
+export const cartRouter: Router = Router();
 
 // Define proper interfaces for cart and cart items
 interface CartItem {

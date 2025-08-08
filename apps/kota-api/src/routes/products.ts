@@ -3,7 +3,7 @@ import axios from "axios";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { fakeStoreApi, handleApiError } from "../utils/api";
 
-const productRouter = Router();
+const productRouter: Router = Router();
 
 /**
  * Get all products
