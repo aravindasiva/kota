@@ -1,135 +1,205 @@
-# Turborepo starter
+# Kota Store - Modern E-Commerce Application
 
-This Turborepo starter is maintained by the Turborepo core team.
+![alt text](image.png)![alt text](image-1.png)
+![alt text](image-2.png)![alt text](image-3.png)
 
-## Using this example
+[Kota Store Preview](https://via.placeholder.com/1200x630?text=Kota+Store+Preview)
 
-Run the following command:
+A modern e-commerce application built with Next.js, featuring a responsive design, seamless cart management, and user authentication. This application demonstrates a complete MCP (Model-Context-Protocol) architecture by integrating with the FakeStore API.
 
-```sh
-npx create-turbo@latest
-```
+## 🌟 Features
 
-## What's inside?
+- **User Authentication** - Complete login system with session management
+- **Product Browsing** - View all products with filtering and sorting capabilities
+- **Product Details** - Detailed product view with image magnification and related products
+- **Shopping Cart** - Add, remove, and modify items in your cart
+- **Responsive Design** - Works beautifully on all devices
+- **Advanced UI Features**:
+  - Image magnification on hover
+  - Animated backgrounds
+  - Custom scrollbars
+  - Smooth animations and transitions
+  - "Scroll to top" functionality
+  - Product recommendations
 
-This Turborepo includes the following packages/apps:
+## 🚀 Demo
 
-### Apps and Packages
+![Demo GIF](https://via.placeholder.com/800x450?text=Demo+GIF)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+[View Live Demo](https://github.com/aravindasiva/kota)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## 🛠️ Technology Stack
 
-### Utilities
+- **Frontend:**
+  - Next.js 14 (App Router)
+  - React 18
+  - TailwindCSS for styling
+  - Framer Motion for animations
+  - Context API for state management
 
-This Turborepo has some additional tools already setup for you:
+- **Backend Integration:**
+  - FakeStore API for product data
+  - Custom MCP server implementation
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- **Tools:**
+  - NX Monorepo for project management
+  - ESLint for code quality
+  - Prettier for code formatting
 
-### Build
+## 📂 Project Structure
 
-To build all apps and packages, run the following command:
+The project follows a monorepo structure using NX:
 
-```
-cd my-turborepo
+\`\`\`
+kota/
+├── apps/
+│   ├── kota-api/        # Express API server (MCP implementation)
+│   │   ├── src/
+│   │   │   ├── controllers/  # API controllers
+│   │   │   ├── models/       # Data models
+│   │   │   ├── routes/       # API routes
+│   │   │   └── main.ts       # Entry point
+│   ├── kota-web/        # Next.js frontend
+│   │   ├── src/
+│   │   │   ├── app/          # Next.js app router
+│   │   │   ├── components/   # React components
+│   │   │   ├── context/      # React context providers
+│   │   │   ├── utils/        # Utility functions
+│   │   │   └── styles/       # Global styles
+├── libs/                # Shared libraries
+└── nx.json              # NX configuration
+\`\`\`
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+## 🔧 Installation & Setup
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+### Prerequisites
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+- Node.js (v18 or higher)
+- npm or yarn
+- NX CLI (optional for monorepo commands)
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+### Environment Variables
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+Create a \`.env\` file in both the \`apps/kota-api\` and \`apps/kota-web\` directories:
 
-### Develop
+For \`apps/kota-api/.env\`:
+\`\`\`
+PORT=3001
+NODE_ENV=development
+FAKESTORE_API_URL=https://fakestoreapi.com
+\`\`\`
 
-To develop all apps and packages, run the following command:
+For \`apps/kota-web/.env.local\`:
+\`\`\`
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+\`\`\`
 
-```
-cd my-turborepo
+### Installation Steps
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+1. Clone the repository:
+\`\`\`bash
+git clone https://github.com/aravindasiva/kota.git
+cd kota
+\`\`\`
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+2. Install dependencies:
+\`\`\`bash
+npm install
+# or
+yarn install
+\`\`\`
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+3. Start the development servers:
+\`\`\`bash
+# Start both API and web applications
+npx nx run-many --target=serve --projects=kota-api,kota-web --parallel
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+# Or start them individually
+npx nx serve kota-api
+npx nx serve kota-web
+\`\`\`
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+4. Access the application:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - API: [http://localhost:3001/api](http://localhost:3001/api)
 
-### Remote Caching
+## 🌐 API Integration
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+This application uses the FakeStore API through a custom MCP server implementation. The API provides:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+- Product catalog and details
+- User authentication
+- Shopping cart management
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+### API Endpoints
 
-```
-cd my-turborepo
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| \`/api/products\` | GET | Get all products |
+| \`/api/products/:id\` | GET | Get product details |
+| \`/api/products/category/:category\` | GET | Get products by category |
+| \`/api/auth/login\` | POST | User login |
+| \`/api/auth/register\` | POST | User registration |
+| \`/api/cart\` | GET | Get user's cart |
+| \`/api/cart\` | POST | Add item to cart |
+| \`/api/cart/:id\` | DELETE | Remove item from cart |
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+## 🧪 Testing
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+\`\`\`bash
+# Run all tests
+npx nx run-many --target=test --all
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+# Run tests for a specific project
+npx nx test kota-web
+npx nx test kota-api
+\`\`\`
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## 📱 Mobile Responsiveness
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+![Mobile Preview](https://via.placeholder.com/400x800?text=Mobile+View)
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+The application is fully responsive and optimized for:
+- Desktop
+- Tablet
+- Mobile devices
 
-## Useful Links
+## ✨ User Experience Improvements
 
-Learn more about the power of Turborepo:
+- **Product Image Magnifier**: Zoom in on product images for detailed viewing
+- **Animated Background**: Subtle, flowing background animations enhance the visual experience
+- **Custom Scrollbars**: Sleek, modern scrollbars for better navigation
+- **Related Products**: Product recommendations based on browsing history
+- **Intuitive Cart**: Easy-to-use cart with quantity adjustments and quick removal
+- **Smooth Animations**: Page transitions and UI interactions use subtle animations
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 🔒 Security Features
+
+- Secure authentication flow
+- Protected API endpoints
+- Input validation and sanitization
+
+## 🚦 Project Status
+
+This project was developed to demonstrate fullstack development skills.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgements
+
+- [FakeStore API](https://fakestoreapi.com/) for providing product data
+- [Next.js](https://nextjs.org/) for the frontend framework
+- [TailwindCSS](https://tailwindcss.com/) for styling
+- [Framer Motion](https://www.framer.com/motion/) for animations
+
+## 📞 Contact
+
+Aravinda Siva - [GitHub](https://github.com/aravindasiva)
+
+Project Link: [https://github.com/aravindasiva/kota](https://github.com/aravindasiva/kota)
+
+---
+
+Made with ❤️ by aravindasiva
