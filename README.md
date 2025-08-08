@@ -1,198 +1,146 @@
 # Kota Store - Modern E-Commerce Application
 
-![alt text](image.png)![alt text](image-1.png)
-![alt text](image-2.png)![alt text](image-3.png)
+## 🚀 Live Demo
 
-[Kota Store Preview](https://via.placeholder.com/1200x630?text=Kota+Store+Preview)
+**Frontend using backend:** [https://kota-web-cxx.vercel.app/](https://kota-web-cxx.vercel.app/)  
+<br>
+
+**API:** [https://kota-api-cxx.onrender.com/](https://kota-api-cxx.onrender.com/)
 
 A modern e-commerce application built with Next.js, featuring a responsive design, seamless cart management, and user authentication. This application demonstrates a complete MCP (Model-Context-Protocol) architecture by integrating with the FakeStore API.
 
 ## 🌟 Features
 
-- **User Authentication** - Complete login system with session management
-- **Product Browsing** - View all products with filtering and sorting capabilities
-- **Product Details** - Detailed product view with image magnification and related products
-- **Shopping Cart** - Add, remove, and modify items in your cart
-- **Responsive Design** - Works beautifully on all devices
+- **User Authentication** - Secure login system with JWT session management
+- **Product Browsing** - Browse products with filtering capabilities
+- **Product Details** - View detailed product information with image zoom
+- **Shopping Cart** - Add, remove, and update items in your cart
+- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
 - **Advanced UI Features**:
   - Image magnification on hover
-  - Animated backgrounds
-  - Custom scrollbars
-  - Smooth animations and transitions
-  - "Scroll to top" functionality
+  - Animated components
+  - Smooth transitions
+  - "Back to top" functionality
   - Product recommendations
 
-## 🚀 Demo
+## 🖥️ Screenshot (Desktop)
+![alt text](image.png)![alt text](image-1.png)
 
-![Demo GIF](https://via.placeholder.com/800x450?text=Demo+GIF)
-
-[View Live Demo](https://github.com/aravindasiva/kota)
+## 🖥️ Screenshot (Mobile & Tablet)
+![alt text](image-2.png)![alt text](image-3.png)
 
 ## 🛠️ Technology Stack
 
 - **Frontend:**
   - Next.js 14 (App Router)
   - React 18
-  - TailwindCSS for styling
-  - Framer Motion for animations
-  - Context API for state management
+  - TailwindCSS
+  - Framer Motion
+  - React Context API
 
-- **Backend Integration:**
-  - FakeStore API for product data
-  - Custom MCP server implementation
+- **Backend:**
+  - Express.js
+  - Node.js
+  - FakeStore API integration
+
+- **Deployment:**
+  - Frontend: Vercel
+  - Backend: Render
 
 - **Tools:**
-  - NX Monorepo for project management
-  - ESLint for code quality
-  - Prettier for code formatting
+  - NX Monorepo
+  - Docker
+  - ESLint & Prettier
 
 ## 📂 Project Structure
 
-The project follows a monorepo structure using NX:
-
-\`\`\`
+```
 kota/
 ├── apps/
 │   ├── kota-api/        # Express API server (MCP implementation)
-│   │   ├── src/
-│   │   │   ├── controllers/  # API controllers
-│   │   │   ├── models/       # Data models
-│   │   │   ├── routes/       # API routes
-│   │   │   └── main.ts       # Entry point
-│   ├── kota-web/        # Next.js frontend
-│   │   ├── src/
-│   │   │   ├── app/          # Next.js app router
-│   │   │   ├── components/   # React components
-│   │   │   ├── context/      # React context providers
-│   │   │   ├── utils/        # Utility functions
-│   │   │   └── styles/       # Global styles
-├── libs/                # Shared libraries
-└── nx.json              # NX configuration
-\`\`\`
+│   │   ├── src/         # API source code
+│   │   └── Dockerfile   # Container configuration
+│   │
+│   └── kota-web/        # Next.js frontend
+│       ├── src/         # Frontend source code
+│       └── public/      # Static assets
+│
+└── package.json         # Root package configuration
+```
 
-## 🔧 Installation & Setup
+## 🔧 Quick Start
 
 ### Prerequisites
 
 - Node.js (v18 or higher)
 - npm or yarn
-- NX CLI (optional for monorepo commands)
+- Docker (optional)
 
-### Environment Variables
-
-Create a \`.env\` file in both the \`apps/kota-api\` and \`apps/kota-web\` directories:
-
-For \`apps/kota-api/.env\`:
-\`\`\`
-PORT=3001
-NODE_ENV=development
-FAKESTORE_API_URL=https://fakestoreapi.com
-\`\`\`
-
-For \`apps/kota-web/.env.local\`:
-\`\`\`
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
-\`\`\`
-
-### Installation Steps
+### Local Development
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone https://github.com/aravindasiva/kota.git
 cd kota
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
+```bash
 npm install
-# or
-yarn install
-\`\`\`
+```
 
 3. Start the development servers:
-\`\`\`bash
-# Start both API and web applications
-npx nx run-many --target=serve --projects=kota-api,kota-web --parallel
+```bash
+# Start API server
+cd apps/kota-api
+npm run dev
 
-# Or start them individually
-npx nx serve kota-api
-npx nx serve kota-web
-\`\`\`
+# Start web application (in another terminal)
+cd apps/kota-web
+npm run dev
+```
 
-4. Access the application:
+4. Access the applications:
    - Frontend: [http://localhost:3000](http://localhost:3000)
-   - API: [http://localhost:3001/api](http://localhost:3001/api)
+   - API: [http://localhost:3001](http://localhost:3001)
+
+### Using Docker
+
+```bash
+# Build and run the API container
+docker build -t kota-api -f apps/kota-api/Dockerfile .
+docker run -p 3001:10000 -e PORT=10000 kota-api
+```
 
 ## 🌐 API Integration
 
-This application uses the FakeStore API through a custom MCP server implementation. The API provides:
+This application uses a custom MCP server implementation to connect with the FakeStore API.
 
-- Product catalog and details
-- User authentication
-- Shopping cart management
-
-### API Endpoints
+### Core Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| \`/api/products\` | GET | Get all products |
-| \`/api/products/:id\` | GET | Get product details |
-| \`/api/products/category/:category\` | GET | Get products by category |
-| \`/api/auth/login\` | POST | User login |
-| \`/api/auth/register\` | POST | User registration |
-| \`/api/cart\` | GET | Get user's cart |
-| \`/api/cart\` | POST | Add item to cart |
-| \`/api/cart/:id\` | DELETE | Remove item from cart |
+| `/products` | GET | Get all products |
+| `/products/:id` | GET | Get product details |
+| `/auth/login` | POST | User login |
+| `/carts/user/:id` | GET | Get user's cart |
+| `/carts` | POST | Add item to cart |
+| `/carts/:id/product/:id` | DELETE | Remove item from cart |
 
-## 🧪 Testing
+## 📱 Responsive Design
 
-\`\`\`bash
-# Run all tests
-npx nx run-many --target=test --all
+The application is fully responsive and provides an optimal viewing experience across all device sizes:
 
-# Run tests for a specific project
-npx nx test kota-web
-npx nx test kota-api
-\`\`\`
+- Desktop (1024px and above)
+- Tablet (768px to 1023px)
+- Mobile (below 768px)
 
-## 📱 Mobile Responsiveness
+## 🔒 Authentication
 
-![Mobile Preview](https://via.placeholder.com/400x800?text=Mobile+View)
+Test the application with these credentials:
 
-The application is fully responsive and optimized for:
-- Desktop
-- Tablet
-- Mobile devices
-
-## ✨ User Experience Improvements
-
-- **Product Image Magnifier**: Zoom in on product images for detailed viewing
-- **Animated Background**: Subtle, flowing background animations enhance the visual experience
-- **Custom Scrollbars**: Sleek, modern scrollbars for better navigation
-- **Related Products**: Product recommendations based on browsing history
-- **Intuitive Cart**: Easy-to-use cart with quantity adjustments and quick removal
-- **Smooth Animations**: Page transitions and UI interactions use subtle animations
-
-## 🔒 Security Features
-
-- Secure authentication flow
-- Protected API endpoints
-- Input validation and sanitization
-
-## 🚦 Project Status
-
-This project was developed to demonstrate fullstack development skills.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgements
-
-- [FakeStore API](https://fakestoreapi.com/) for providing product data
-- [Next.js](https://nextjs.org/) for the frontend framework
-- [TailwindCSS](https://tailwindcss.com/) for styling
-- [Framer Motion](https://www.framer.com/motion/) for animations
+- Username: `johnd`
+- Password: `m38rmF$`
 
 ## 📞 Contact
 
