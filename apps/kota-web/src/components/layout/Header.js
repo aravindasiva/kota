@@ -48,8 +48,8 @@ export default function Header() {
   return (
     <div className="fixed top-5 left-0 right-0 z-40 px-4">
       <motion.header
-        className={`max-w-4xl mx-auto rounded-full bg-white/90 backdrop-blur-md 
-                   ${isScrolled ? "shadow-lg" : "shadow-md"} transition-all duration-500`}
+        className={`max-w-4xl mx-auto rounded-lg md:rounded-full bg-white/90 backdrop-blur-md 
+             ${isScrolled ? "shadow-lg" : "shadow-md"} transition-all duration-500`}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
