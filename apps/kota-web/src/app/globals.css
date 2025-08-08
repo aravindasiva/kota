@@ -1,26 +1,90 @@
-@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap");
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    @apply bg-neutral text-primary-dark font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-medium;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .container-custom {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-2 rounded-full font-medium 
+    transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer;
+  }
+
+  .btn-primary {
+    @apply bg-secondary text-primary-dark hover:bg-secondary-light;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-neutral;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-floating overflow-hidden 
+    transition-all duration-500 hover:shadow-hover cursor-pointer;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 border-2 border-primary-light rounded-full bg-neutral 
+    focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary;
+  }
+
+  .perspective {
+    @apply transition-transform duration-300;
+    transform-style: preserve-3d;
+  }
+
+  .animate-in-toast {
+    animation: toastIn 0.5s ease forwards;
+  }
+}
+
+/* Product card hover effect */
+.product-overlay {
+  @apply absolute inset-0 opacity-0 
+         transition-all duration-700 ease-in-out;
+  transform: translateY(80px);
+}
+
+.product-card:hover .product-overlay {
+  @apply opacity-100;
+  transform: translateY(0);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.1);
+}
+
+/* Toast animation */
+@keyframes toastIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
