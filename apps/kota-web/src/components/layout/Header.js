@@ -1,15 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { cartOpen, setCartOpen, cartItemsCount, isAuthenticated } = useCart();
+  const { cartOpen, setCartOpen, cartItemsCount } = useCart();
+  const { isAuthenticated, user, logout, setIsLoginOpen } = useAuth();
+  const userMenuRef = useRef(null);
 
   // Handle scroll effect
   useEffect(() => {
@@ -25,6 +30,20 @@ export default function Header() {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="fixed top-5 left-0 right-0 z-40 px-4">
@@ -90,31 +109,84 @@ export default function Header() {
 
           {/* Right side icons */}
           <div className="flex items-center space-x-4">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="hidden md:block"
-            >
-              <Link
-                href="/login"
-                className="text-primary-dark hover:text-primary transition-colors duration-300"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            <div className="hidden md:block relative" ref={userMenuRef}>
+              {isAuthenticated ? (
+                <>
+                  <motion.div
+                    className="h-8 w-8 rounded-full bg-primary text-neutral flex items-center justify-center font-medium text-sm cursor-pointer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    aria-label="User menu"
+                  >
+                    {user?.initials || "U"}
+                  </motion.div>
+
+                  {/* User dropdown menu - Fixed positioning */}
+                  <AnimatePresence>
+                    {userMenuOpen && (
+                      <motion.div
+                        className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg overflow-hidden z-20"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                      >
+                        <div className="px-4 py-3 border-b">
+                          <p className="font-medium text-primary-dark">
+                            {user?.name}
+                          </p>
+                          <p className="text-xs text-primary-dark/70 truncate">
+                            {user?.email}
+                          </p>
+                        </div>
+
+                        <div className="py-1">
+                          <motion.button
+                            onClick={() => {
+                              logout();
+                              setUserMenuOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-primary-dark hover:bg-neutral transition-colors"
+                            whileHover={{ backgroundColor: "#f2f2f2" }}
+                          >
+                            Logout
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              ) : (
+                <motion.button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="text-primary-dark hover:text-primary transition-colors duration-300"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Login"
+                  title="Login"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </Link>
-            </motion.div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </motion.button>
+              )}
+            </div>
 
             <motion.button
               className="relative"
@@ -125,6 +197,7 @@ export default function Header() {
               whileTap={{ scale: 0.9 }}
               onClick={() => setCartOpen(true)}
               aria-label="Open cart"
+              title="Cart"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -148,6 +221,7 @@ export default function Header() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
+                    key="cart-count"
                   >
                     {cartItemsCount}
                   </motion.span>
@@ -161,6 +235,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="text-primary-dark hover:text-primary transition-colors duration-300"
                 whileTap={{ scale: 0.9 }}
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               >
                 {mobileMenuOpen ? (
                   <svg
@@ -221,12 +296,51 @@ export default function Header() {
                 >
                   Products
                 </Link>
-                <Link
-                  href="/login"
-                  className="py-2 font-semibold text-primary-dark hover:text-primary transition-colors duration-300"
-                >
-                  Login
-                </Link>
+
+                {isAuthenticated ? (
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-8 rounded-full bg-primary text-neutral flex items-center justify-center font-medium text-sm">
+                        {user?.initials || "U"}
+                      </div>
+                      <div>
+                        <p className="font-medium text-primary-dark">
+                          {user?.name}
+                        </p>
+                        <button
+                          onClick={logout}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setIsLoginOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="py-2 font-semibold text-primary hover:text-primary-dark transition-colors duration-300 flex items-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    Login
+                  </button>
+                )}
               </nav>
             </motion.div>
           )}

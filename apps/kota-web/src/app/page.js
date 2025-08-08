@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useCart } from "@/context/CartContext";
+import { productsApi } from "../utils/api";
+import ProductCard from "../components/products/ProductCard";
+import ProductDetailModal from "../components/products/ProductDetailModal";
+import ScrollToTopButton from "../components/layout/ScrollToTopButton";
 
 // Animation variants
 const fadeInUp = {
@@ -31,32 +34,21 @@ const staggerContainer = {
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [tiltValues, setTiltValues] = useState({});
-  const productRefs = useRef([]);
-  const { addToCart, cartItems, setCartOpen } = useCart();
-
-  // Current date/time display
-  const currentDateTime = "2025-08-08 01:47:05";
-  const currentUser = "aravindasiva";
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch(
-          "https://fakestoreapi.com/products?limit=8"
-        );
-        const data = await response.json();
-        setProducts(data);
+        // Use our API utility to get products and limit to 8 for featured items
+        const allProducts = await productsApi.getAll();
 
-        // Initialize tilt values for each product
-        const initialTiltValues = {};
-        data.forEach((product) => {
-          initialTiltValues[product.id] = { x: 0, y: 0 };
-        });
+        // Get highest rated or newest products as featured items
+        const featuredProducts = [...allProducts]
+          .sort((a, b) => (b.rating?.rate || 0) - (a.rating?.rate || 0))
+          .slice(0, 8);
 
-        setTiltValues(initialTiltValues);
-
-        productRefs.current = productRefs.current.slice(0, data.length);
+        setProducts(featuredProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -67,58 +59,26 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // Handle 3D tilt effect
-  const handleMouseMove = (e, productId) => {
-    const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const tiltX = (y - centerY) / 10;
-    const tiltY = -(x - centerX) / 20;
-
-    setTiltValues((prev) => ({
-      ...prev,
-      [productId]: { x: tiltX, y: tiltY },
-    }));
-  };
-
-  const handleMouseLeave = (productId) => {
-    setTiltValues((prev) => ({
-      ...prev,
-      [productId]: { x: 0, y: 0 },
-    }));
-  };
-
-  // Get product quantity from cart
-  const getQuantity = (productId) => {
-    return cartItems[productId] || 0;
-  };
-
-  // Handle quantity change
-  const handleQuantityChange = (e, productId, change) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart(productId, change);
+  // Handle product click
+  const handleViewProduct = (product) => {
+    setSelectedProduct(product);
+    setModalOpen(true);
   };
 
   return (
     <div>
-      {/* Hero section */}
+      {/* Hero section - UPDATED with simpler background and single button */}
       <section className="relative h-[80vh] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              'url("https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop")',
-            opacity: 0.6,
+              'url("https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2158")',
+            opacity: 0.7,
           }}
         ></div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-dark/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-dark/50 to-transparent"></div>
 
         <div className="container mx-auto px-4 h-full flex flex-col justify-center relative z-10">
           <motion.div
@@ -139,37 +99,24 @@ export default function Home() {
               variants={fadeInUp}
               className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
             >
-              Modern <span className="text-secondary">Essentials</span> For Your
-              Lifestyle
+              Inspired by <span className="text-secondary">nature</span>,
+              designed for you
             </motion.h1>
 
             <motion.p
               variants={fadeInUp}
               className="text-lg md:text-xl text-neutral mb-10 max-w-lg"
             >
-              Curated collection of high-quality products designed for everyday
-              elegance.
+              Sustainable products that blend beauty with functionality
             </motion.p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
+            <motion.div variants={fadeInUp}>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Link href="/products" className="btn btn-primary shadow-lg">
-                  Explore
-                </Link>
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link
-                  href="/about"
-                  className="btn btn-outline border-2 border-neutral text-neutral hover:bg-neutral hover:text-primary-dark"
-                >
-                  About
+                  Explore Collection
                 </Link>
               </motion.div>
             </motion.div>
@@ -190,14 +137,22 @@ export default function Home() {
             variants={fadeInUp}
           >
             <h2 className="text-3xl md:text-5xl font-bold text-primary-dark mb-4">
-              Collection
+              Featured Products
             </h2>
             <div className="w-24 h-1 bg-secondary mx-auto mb-6"></div>
+            <p className="text-primary max-w-xl mx-auto">
+              Our most popular items, selected based on customer ratings and
+              popularity.
+            </p>
           </motion.div>
 
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin h-10 w-10 border-4 border-primary rounded-full border-t-transparent"></div>
+              <motion.div
+                className="h-10 w-10 border-4 border-primary rounded-full border-t-transparent"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, ease: "linear", repeat: Infinity }}
+              />
             </div>
           ) : (
             <motion.div
@@ -207,149 +162,16 @@ export default function Home() {
               viewport={{ once: true }}
               variants={staggerContainer}
             >
-              {products.map((product, index) => (
+              {products.map((product) => (
                 <motion.div
                   key={product.id}
-                  ref={(el) => (productRefs.current[index] = el)}
-                  className="product-card perspective"
                   variants={fadeInUp}
-                  style={{
-                    transform: `perspective(1000px) rotateX(${tiltValues[product.id]?.x || 0}deg) rotateY(${tiltValues[product.id]?.y || 0}deg)`,
-                  }}
-                  onMouseMove={(e) => handleMouseMove(e, product.id)}
-                  onMouseLeave={() => handleMouseLeave(product.id)}
-                  whileHover={{
-                    y: -10,
-                    transition: { duration: 0.3, ease: "easeOut" },
-                  }}
+                  className="h-full" /* Ensure consistent height */
                 >
-                  <Link
-                    href={`/products/${product.id}`}
-                    className="block card h-full relative"
-                    title={product.title}
-                  >
-                    <div className="relative pt-[100%] bg-white overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="product-image absolute top-0 left-0 w-full h-full object-contain p-6 transition-transform duration-700"
-                      />
-
-                      <div className="product-overlay bg-primary/50 flex flex-col justify-between">
-                        <div className="p-5">
-                          <span className="text-xs uppercase tracking-wider text-neutral mb-2 inline-block">
-                            {product.category}
-                          </span>
-                          <p className="text-neutral">{product.description}</p>
-                        </div>
-
-                        {/* Quantity Controls - Bottom Right */}
-                        <div className="absolute bottom-4 right-4">
-                          {getQuantity(product.id) === 0 ? (
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={(e) =>
-                                handleQuantityChange(e, product.id, 1)
-                              }
-                              className="h-10 w-10 rounded-full bg-secondary text-primary-dark shadow-md flex items-center justify-center"
-                              aria-label={`Add ${product.title} to cart`}
-                              title="Add to cart"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                />
-                              </svg>
-                            </motion.button>
-                          ) : (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              className="flex items-center bg-white rounded-full shadow-lg overflow-hidden"
-                            >
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) =>
-                                  handleQuantityChange(e, product.id, -1)
-                                }
-                                className="h-10 w-10 bg-secondary text-primary-dark flex items-center justify-center"
-                                aria-label="Decrease quantity"
-                                title="Decrease quantity"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M18 12H6"
-                                  />
-                                </svg>
-                              </motion.button>
-
-                              <span className="px-3 font-semibold text-primary-dark">
-                                {getQuantity(product.id)}
-                              </span>
-
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) =>
-                                  handleQuantityChange(e, product.id, 1)
-                                }
-                                className="h-10 w-10 bg-secondary text-primary-dark flex items-center justify-center"
-                                aria-label="Increase quantity"
-                                title="Increase quantity"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                  />
-                                </svg>
-                              </motion.button>
-                            </motion.div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex justify-between items-center">
-                        <h3
-                          className="font-medium text-primary-dark line-clamp-1 pr-4"
-                          title={product.title}
-                        >
-                          {product.title}
-                        </h3>
-                        <span className="font-medium text-lg text-secondary">
-                          ${product.price.toFixed(0)}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                  <ProductCard
+                    product={product}
+                    onViewDetails={handleViewProduct}
+                  />
                 </motion.div>
               ))}
             </motion.div>
@@ -473,79 +295,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Toast notification */}
-      <div
-        id="toast"
-        className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-secondary text-primary-dark px-6 py-3 rounded-full shadow-lg hidden animate-in-toast z-50"
-      >
-        Item added to cart!
-      </div>
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onViewDetails={handleViewProduct}
+      />
 
       {/* Scroll to top button */}
       <ScrollToTopButton />
-
-      {/* Footer content showing date and user */}
-      <div className="text-center py-4 text-xs text-primary-dark/70 border-t border-primary-dark/10">
-        <p>
-          Current Date: {currentDateTime} | User: {currentUser}
-        </p>
-      </div>
     </div>
-  );
-}
-
-// Scroll to top button component
-function ScrollToTopButton() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.scrollY > 500) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener("scroll", toggleVisibility);
-    return () => window.removeEventListener("scroll", toggleVisibility);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  return (
-    <motion.button
-      className="fixed bottom-8 right-8 p-4 rounded-full bg-white text-primary shadow-floating z-30 cursor-pointer"
-      onClick={scrollToTop}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{
-        opacity: isVisible ? 1 : 0,
-        scale: isVisible ? 1 : 0,
-      }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      title="Scroll to top"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M5 15l7-7 7 7"
-        />
-      </svg>
-    </motion.button>
   );
 }
